@@ -348,8 +348,8 @@ body:not(.auth-locked) nav button.on{color:#fff!important;background:linear-grad
       <h2>Seja bem-vindo!</h2><p class="auth-welcome">Ao Cronograma Leonardo</p><p class="auth-sub">Entre com seu login e senha para acessar o sistema</p><div class="auth-version">VERSÃO 4.1 · ACESSO INSTITUCIONAL</div>
     </div>
     <div class="auth-choices auth-main-choices">
-      <button type="button" class="auth-choice admin" id="authAdmin">👑 Logar como administrador</button>
-      <button type="button" class="auth-choice guest" id="authGuest">👁️ Logar como convidado</button>
+      <button type="button" class="auth-choice admin" id="authAdmin" onclick="window.CronoAuth&&window.CronoAuth.open('admin')">👑 Logar como administrador</button>
+      <button type="button" class="auth-choice guest" id="authGuest" onclick="window.CronoAuth&&window.CronoAuth.open('guest')">👁️ Logar como convidado</button>
     </div>
     <button type="button" class="auth-appearance" id="authAppearance">🎨 Escolher cores e aparência</button>
     <div id="authError" class="auth-error" aria-live="polite"></div>
@@ -826,77 +826,120 @@ setInterval(tick,1000);applyT();tick();rs();rd();rc();rsent();ejload();$('#bRem'
 </script>
 
 <script>
-/* === Controle de acesso local do Cronograma ===
- * Observação: como este é um único HTML público, o login é uma barreira de uso no navegador,
- * não uma autenticação de servidor. Para segurança real com dados privados, use autenticação + backend.
- */
+/* === Controle de acesso local do Cronograma — versão final robusta === */
 (function(){
   const AUTH_KEY='cronoLeo_auth_v1';
   const USERS={
-    // Credenciais padrão: altere estas duas linhas se quiser personalizá-las.
     admin:{user:'leonardo',pass:'Leo@2026#Crono',role:'admin'},
     guest:{user:'convidado',pass:'convidado',role:'guest'}
   };
+
   const gate=document.getElementById('authGate');
-  const form=document.getElementById('authForm');
-  const error=document.getElementById('authError');
   const modal=document.getElementById('authCredentials');
+  const form=document.getElementById('authForm');
+  const userInput=document.getElementById('authUser');
+  const passInput=document.getElementById('authPass');
   const modalError=document.getElementById('authModalError');
   const credentialsTitle=document.getElementById('credentialsTitle');
   const credentialsSubtitle=document.getElementById('credentialsSubtitle');
   const credentialsIcon=document.getElementById('credentialsIcon');
-  if(!gate||!form)return;
+  const mainError=document.getElementById('authError');
 
-  const normalize=v=>String(v||'').trim().toLowerCase();
-  const getUser=(u,p)=>Object.values(USERS).find(x=>normalize(x.user)===normalize(u)&&x.pass===p);
+  if(!gate||!modal||!form||!userInput||!passInput)return;
 
-  // Escolha de aparência também disponível antes do login.
+  const normalize=v=>String(v??'').trim().toLowerCase();
+  const getUser=(u,p)=>Object.values(USERS).find(x=>normalize(x.user)===normalize(u)&&x.pass===String(p??''));
+
+  /* Paletas disponíveis antes e depois do login. */
   const PALETTES={royal:['#4f46e5','#7c3aed'],ocean:['#0f766e','#0891b2'],sunset:['#ea580c','#db2777'],emerald:['#059669','#0d9488'],slate:['#334155','#475569'],violet:['#9333ea','#c026d3']};
   const paletteNames={royal:'Royal',ocean:'Oceano',sunset:'Pôr do sol',emerald:'Esmeralda',slate:'Ardósia',violet:'Violeta'};
-  const paletteBox=document.getElementById('authPalette'), paletteGrid=paletteBox?.querySelector('.auth-palette-grid');
-  function loadPalette(){try{const raw=JSON.parse(localStorage.getItem('cronoLeo_v7')||'null');const p=raw?.set?.palette||'royal';document.documentElement.dataset.palette=PALETTES[p]?p:'royal';}catch(e){document.documentElement.dataset.palette='royal';}}
-  function renderAuthPalettes(){if(!paletteGrid)return;const current=document.documentElement.dataset.palette||'royal';paletteGrid.innerHTML=Object.entries(PALETTES).map(([k,c])=>`<button type="button" class="auth-pick ${current===k?'active':''}" data-auth-palette="${k}"><span class="sw"><i style="background:${c[0]}"></i><i style="background:${c[1]}"></i></span>${paletteNames[k]}</button>`).join('');}
-  function openAuthPalettes(){if(!paletteBox)return;renderAuthPalettes();paletteBox.style.display='flex';paletteBox.setAttribute('aria-hidden','false');}
-  function closeAuthPalettes(){if(!paletteBox)return;paletteBox.style.display='none';paletteBox.setAttribute('aria-hidden','true');}
+  const paletteBox=document.getElementById('authPalette');
+  const paletteGrid=paletteBox?.querySelector('.auth-palette-grid');
+  function loadPalette(){
+    try{
+      const raw=JSON.parse(localStorage.getItem('cronoLeo_v7')||'null');
+      const p=raw?.set?.palette||'royal';
+      document.documentElement.dataset.palette=PALETTES[p]?p:'royal';
+    }catch(e){document.documentElement.dataset.palette='royal';}
+  }
+  function renderAuthPalettes(){
+    if(!paletteGrid)return;
+    const current=document.documentElement.dataset.palette||'royal';
+    paletteGrid.innerHTML=Object.entries(PALETTES).map(([k,c])=>
+      `<button type="button" class="auth-pick ${current===k?'active':''}" data-auth-palette="${k}"><span class="sw"><i style="background:${c[0]}"></i><i style="background:${c[1]}"></i></span>${paletteNames[k]}</button>`
+    ).join('');
+  }
+  function openAuthPalettes(){
+    if(!paletteBox)return;
+    renderAuthPalettes();
+    paletteBox.style.display='flex';
+    paletteBox.setAttribute('aria-hidden','false');
+  }
+  function closeAuthPalettes(){
+    if(!paletteBox)return;
+    paletteBox.style.display='none';
+    paletteBox.setAttribute('aria-hidden','true');
+  }
   loadPalette();
   document.getElementById('authAppearance')?.addEventListener('click',e=>{e.preventDefault();openAuthPalettes();});
   document.getElementById('authPaletteClose')?.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();closeAuthPalettes();});
-  paletteBox?.addEventListener('click',e=>{if(e.target===paletteBox){closeAuthPalettes();return;}const b=e.target.closest('[data-auth-palette]');if(!b)return;const p=b.dataset.authPalette;if(!PALETTES[p])return;document.documentElement.dataset.palette=p;try{const raw=JSON.parse(localStorage.getItem('cronoLeo_v7')||'null')||{};raw.set=raw.set||{};raw.set.palette=p;localStorage.setItem('cronoLeo_v7',JSON.stringify(raw));}catch(err){}renderAuthPalettes();});
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&paletteBox?.style.display==='flex')closeAuthPalettes();});
+  paletteBox?.addEventListener('click',e=>{
+    if(e.target===paletteBox){closeAuthPalettes();return;}
+    const b=e.target.closest('[data-auth-palette]');
+    if(!b)return;
+    const p=b.dataset.authPalette;
+    if(!PALETTES[p])return;
+    document.documentElement.dataset.palette=p;
+    try{
+      const raw=JSON.parse(localStorage.getItem('cronoLeo_v7')||'null')||{};
+      raw.set=raw.set||{};
+      raw.set.palette=p;
+      localStorage.setItem('cronoLeo_v7',JSON.stringify(raw));
+    }catch(err){}
+    renderAuthPalettes();
+  });
 
-  // Cada botão abre sua própria janela para solicitar login e senha.
   let selectedRole='admin';
-  function openCredentials(role){
-    selectedRole=role;
-    const isAdmin=role==='admin';
-    credentialsTitle.textContent=isAdmin?'Login de administrador':'Login de convidado';
-    credentialsSubtitle.textContent=isAdmin?'Digite o login e a senha do administrador para continuar.':'Digite o login e a senha do convidado para continuar.';
-    credentialsIcon.textContent=isAdmin?'👑':'👁️';
-    document.getElementById('authUser').value='';
-    document.getElementById('authPass').value='';
+
+  function clearLoginErrors(){
     if(modalError)modalError.textContent='';
-    modal.classList.add('show');modal.setAttribute('aria-hidden','false');
-    setTimeout(()=>document.getElementById('authUser').focus(),80);
+    if(mainError)mainError.textContent='';
   }
-  function closeCredentials(){modal.classList.remove('show');modal.setAttribute('aria-hidden','true');}
-  document.getElementById('authAdmin')?.addEventListener('click',()=>openCredentials('admin'));
-  document.getElementById('authGuest')?.addEventListener('click',()=>openCredentials('guest'));
-  document.getElementById('credentialsClose')?.addEventListener('click',closeCredentials);
-  modal?.addEventListener('click',e=>{if(e.target===modal)closeCredentials()});
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal?.classList.contains('show'))closeCredentials()});
 
+  function openCredentials(role){
+    selectedRole=role==='guest'?'guest':'admin';
+    const isAdmin=selectedRole==='admin';
+    if(credentialsTitle)credentialsTitle.textContent=isAdmin?'Login de administrador':'Login de convidado';
+    if(credentialsSubtitle)credentialsSubtitle.textContent=isAdmin
+      ?'Digite o login e a senha do administrador para continuar.'
+      :'Digite o login e a senha do convidado para continuar.';
+    if(credentialsIcon)credentialsIcon.textContent=isAdmin?'👑':'👁️';
+    userInput.value='';
+    passInput.value='';
+    clearLoginErrors();
+    modal.classList.add('show');
+    modal.setAttribute('aria-hidden','false');
+    setTimeout(()=>userInput.focus(),60);
+  }
 
-  function enter(account){
-    document.body.classList.remove('auth-locked');
-    document.body.classList.toggle('guest-mode',account.role==='guest');
-    gate.remove();
-    try{sessionStorage.setItem(AUTH_KEY,JSON.stringify({role:account.role,user:account.user}));}catch(e){}
-    if(account.role==='guest')enableGuestMode();
+  function closeCredentials(){
+    modal.classList.remove('show');
+    modal.setAttribute('aria-hidden','true');
+  }
+
+  function shakeCredentials(){
+    const box=modal.querySelector('.credentials-box');
+    if(!box)return;
+    box.style.animation='none';
+    void box.offsetWidth;
+    box.style.animation='authShake .45s ease';
+    setTimeout(()=>{box.style.animation='authCardIn .35s ease both';},500);
   }
 
   function enableGuestMode(){
     const blocked=new Set(['add','cadd','cdel','clr','del','dsave','dx','edit','ejsave','imp','mailclear','mailsave','nback','ndel','nmail','nnew','nsave','rem','rst','sdel','send','timer','pro-settings-btn','pro-auto-backup']);
-    const proSet=document.getElementById('pro-settings-btn');if(proSet)proSet.classList.add('guest-hide');
+    const proSet=document.getElementById('pro-settings-btn');
+    if(proSet)proSet.classList.add('guest-hide');
     document.querySelectorAll('[data-a]').forEach(el=>{
       if(blocked.has(el.getAttribute('data-a'))){
         el.classList.add('guest-locked');
@@ -904,38 +947,81 @@ setInterval(tick,1000);applyT();tick();rs();rd();rc();rsent();ejload();$('#bRem'
         if('disabled' in el)el.disabled=true;
       }
     });
-    // Evita alterações por elementos adicionados dinamicamente pelo próprio aplicativo.
     document.addEventListener('click',function(e){
       const el=e.target.closest('[data-a]');
       if(el&&blocked.has(el.getAttribute('data-a'))){
-        e.preventDefault();e.stopImmediatePropagation();
+        e.preventDefault();
+        e.stopImmediatePropagation();
         if(typeof window.toast==='function')window.toast('Modo convidado: somente visualização');
       }
     },true);
-    const settingsBtn=document.getElementById('pro-settings-btn');if(settingsBtn)settingsBtn.disabled=true;
-    const banner=document.createElement('div');
-    banner.id='guestBanner';
-    banner.textContent='👁️ Convidado · somente leitura';
-    document.body.appendChild(banner);
+    if(proSet)proSet.disabled=true;
+    const oldBanner=document.getElementById('guestBanner');
+    if(!oldBanner){
+      const banner=document.createElement('div');
+      banner.id='guestBanner';
+      banner.textContent='👁️ Convidado · somente leitura';
+      document.body.appendChild(banner);
+    }
   }
 
-  form.addEventListener('submit',function(e){
+  function enter(account){
+    if(!account)return;
+    clearLoginErrors();
+    document.body.classList.remove('auth-locked');
+    document.body.classList.toggle('guest-mode',account.role==='guest');
+    if(gate && gate.isConnected)gate.remove();
+    try{sessionStorage.setItem(AUTH_KEY,JSON.stringify({role:account.role,user:account.user}));}catch(e){}
+    if(account.role==='guest')enableGuestMode();
+    closeCredentials();
+  }
+
+  /* Expõe a abertura da janela no objeto global para que os botões continuem funcionando
+     mesmo que alguma outra rotina da página seja alterada. */
+  window.CronoAuth={open:openCredentials,close:closeCredentials,enter:enter,logout:function(){try{sessionStorage.removeItem(AUTH_KEY);}catch(e){}location.reload();}};
+
+  /* Liga os botões principais por duas vias: listener direto + delegação em captura. */
+  const adminBtn=document.getElementById('authAdmin');
+  const guestBtn=document.getElementById('authGuest');
+  if(adminBtn)adminBtn.addEventListener('click',e=>{e.preventDefault();openCredentials('admin');});
+  if(guestBtn)guestBtn.addEventListener('click',e=>{e.preventDefault();openCredentials('guest');});
+  document.addEventListener('click',e=>{
+    const b=e.target.closest('#authAdmin,#authGuest');
+    if(!b)return;
+    if(e.defaultPrevented && modal.classList.contains('show'))return;
     e.preventDefault();
-    const account=getUser(document.getElementById('authUser').value,document.getElementById('authPass').value);
-    if(!account || account.role!==selectedRole){
-      if(modalError)modalError.textContent='Login ou senha inválidos para este tipo de acesso.';
-      const box=modal?.querySelector('.credentials-box');
-      if(box){box.style.animation='authShake .45s ease';setTimeout(()=>box.style.animation='authCardIn .35s ease both',500);}
-      document.getElementById('authPass').select();
-      return;
+    openCredentials(b.id==='authGuest'?'guest':'admin');
+  },true);
+
+  document.getElementById('credentialsClose')?.addEventListener('click',e=>{e.preventDefault();closeCredentials();});
+  modal.addEventListener('click',e=>{if(e.target===modal)closeCredentials();});
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){
+      if(modal.classList.contains('show'))closeCredentials();
+      if(paletteBox?.style.display==='flex')closeAuthPalettes();
     }
-    if(modalError)modalError.textContent='';
-    const box=modal?.querySelector('.credentials-box');
-    if(box)box.style.animation='authSuccess .45s ease both';
-    setTimeout(()=>{closeCredentials();enter(account);},260);
   });
 
-  // Recupera a sessão somente nesta aba/janela.
+  /* Login: aceita o Enter no teclado e o botão "Entrar no Cronograma". */
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    e.stopPropagation();
+    const account=getUser(userInput.value,passInput.value);
+    if(!account || account.role!==selectedRole){
+      if(modalError)modalError.textContent='Login ou senha inválidos para este tipo de acesso.';
+      shakeCredentials();
+      passInput.focus();
+      passInput.select();
+      return false;
+    }
+    if(modalError)modalError.textContent='';
+    const box=modal.querySelector('.credentials-box');
+    if(box){box.style.animation='authSuccess .45s ease both';}
+    setTimeout(()=>enter(account),180);
+    return false;
+  });
+
+  /* Recupera a sessão somente nesta aba/janela. */
   try{
     const saved=JSON.parse(sessionStorage.getItem(AUTH_KEY)||'null');
     const account=saved&&Object.values(USERS).find(x=>x.role===saved.role&&normalize(x.user)===normalize(saved.user));
