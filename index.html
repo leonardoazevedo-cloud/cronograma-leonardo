@@ -308,6 +308,27 @@ nav button.on,.btn:not(.g):not(.d):not(.back){background:var(--accent)!important
 #pro-bottom-nav{display:none}.pro-mobile-only{display:none}
 #pro-settings{position:fixed;inset:0;background:rgba(2,6,23,.55);z-index:10020;align-items:center;justify-content:center;padding:18px}.pro-settings-card{width:min(620px,100%);max-height:90vh;overflow:auto;background:var(--card);color:var(--tx);border:1px solid var(--line);border-radius:24px;box-shadow:0 30px 100px rgba(0,0,0,.25);padding:24px}.pro-settings-head{display:flex;justify-content:space-between;align-items:center}.pro-settings-head h2{margin:0}.palette-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}.palette{border:2px solid var(--line);border-radius:14px;padding:10px;background:var(--card);cursor:pointer;text-align:left;color:var(--tx)}.palette.active{border-color:var(--accent)}.palette .sw{display:flex;gap:5px;margin-bottom:7px}.palette .sw i{width:28px;height:10px;border-radius:99px}.pro-setting-row{padding:16px 0;border-bottom:1px solid var(--line)}.pro-setting-row:last-child{border-bottom:0}
 .pro-logout{margin-left:4px}.pro-role{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:var(--accentSoft);color:var(--accent);font-size:12px;font-weight:800}
+/* Identidade visual: cabeçalho e rodapé continuam visíveis no modo claro */
+body:not(.auth-locked){background:linear-gradient(180deg,#eef2ff 0%,var(--bg) 180px)!important;min-height:100vh}
+body:not(.auth-locked) header{background:linear-gradient(135deg,var(--accent),var(--accent2))!important;color:#fff!important;border:0!important;box-shadow:0 10px 30px color-mix(in srgb,var(--accent) 20%,transparent)}
+body:not(.auth-locked) header h1,body:not(.auth-locked) header small,body:not(.auth-locked) header #clk,body:not(.auth-locked) header #dt,body:not(.auth-locked) header #cur{color:#fff!important}
+body:not(.auth-locked) header small{opacity:.88}
+body:not(.auth-locked) nav{background:rgba(255,255,255,.94)!important;box-shadow:0 5px 20px rgba(15,23,42,.06);backdrop-filter:blur(14px)}
+body:not(.auth-locked) nav button{color:var(--mut)!important}
+body:not(.auth-locked) nav button.on{color:#fff!important;background:linear-gradient(135deg,var(--accent),var(--accent2))!important}
+#pro-user-nav{font-weight:800}
+#pro-user-modal{position:fixed;inset:0;z-index:100050;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(2,6,23,.66);backdrop-filter:blur(10px)}
+#pro-user-modal.show{display:flex}
+.pro-user-card{width:min(430px,100%);padding:26px;border-radius:24px;background:var(--card);color:var(--tx);border:1px solid var(--line);box-shadow:0 30px 100px rgba(0,0,0,.35);animation:authCardIn .3s ease both}
+.pro-user-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.pro-user-head h2{margin:0 0 5px}.pro-user-head p{margin:0;color:var(--mut);font-size:13px}
+.pro-user-actions{display:grid;gap:10px;margin-top:20px}.pro-user-actions button{width:100%;padding:13px 14px;border-radius:13px;border:1px solid var(--line);font:inherit;font-weight:850;cursor:pointer;transition:.2s}.pro-user-actions button:hover{transform:translateY(-1px)}
+.pro-user-switch{background:var(--accentSoft);color:var(--accent);border-color:color-mix(in srgb,var(--accent) 25%,var(--line))!important}.pro-user-logout{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:0!important}.pro-user-cancel{background:var(--card);color:var(--tx)}
+#siteFooter{margin-top:42px;padding:26px 20px 90px;background:linear-gradient(135deg,#0f172a,var(--accent) 55%,var(--accent2));color:#fff;position:relative;overflow:hidden}
+#siteFooter:before{content:"";position:absolute;width:280px;height:280px;border-radius:50%;right:-90px;top:-140px;background:rgba(255,255,255,.1)}
+#siteFooter .footer-inner{max-width:1200px;margin:auto;position:relative;z-index:1;display:flex;justify-content:space-between;gap:20px;align-items:center}
+#siteFooter strong{font-size:16px}#siteFooter small{opacity:.82;display:block;margin-top:4px}#siteFooter .footer-badge{padding:8px 11px;border:1px solid rgba(255,255,255,.2);border-radius:999px;background:rgba(255,255,255,.09);font-size:11px;font-weight:800}
+@media(max-width:680px){#pro-user-nav{font-size:11px;padding:7px 8px}.pro-user-card{padding:22px 18px}#siteFooter{padding-bottom:105px}#siteFooter .footer-inner{flex-direction:column;align-items:flex-start}}
+
 .timer-running{box-shadow:0 0 0 3px rgba(34,197,94,.16)!important;border-color:#22c55e!important}.timer-display{font-variant-numeric:tabular-nums;font-weight:800;color:var(--accent)}
 .priority-high{--priority:#dc2626}.priority-medium{--priority:#d97706}.priority-low{--priority:#16a34a}.priority-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--priority,#94a3b8);margin-right:5px}
 @media(max-width:900px){.pro-home-grid{grid-template-columns:repeat(2,1fr)}.pro-home-cols{grid-template-columns:1fr}}
@@ -366,6 +387,7 @@ nav button.on,.btn:not(.g):not(.d):not(.back){background:var(--accent)!important
  <button data-a="tab" data-v="dash">📊 Dashboard</button>
  <button data-a="tab" data-v="notes">📝 Anotações</button>
  <button data-a="tab" data-v="mail">✉️ E-mail</button>
+ <button type="button" id="pro-user-nav">👤 Usuário</button>
 </nav>
 <main>
 
@@ -439,6 +461,23 @@ nav button.on,.btn:not(.g):not(.d):not(.back){background:var(--accent)!important
  </details>
 </section>
 </main>
+<footer id="siteFooter">
+ <div class="footer-inner">
+  <div><strong>📅 Cronograma Leonardo</strong><small>Hospital do Coração Bom Jesus · Organização, acompanhamento e rotina profissional.</small></div>
+  <div class="footer-badge">V4 · Sistema local</div>
+ </div>
+</footer>
+
+<div id="pro-user-modal" aria-hidden="true">
+ <div class="pro-user-card" role="dialog" aria-modal="true" aria-label="Usuário e acesso">
+  <div class="pro-user-head"><div><h2>👤 Usuário e acesso</h2><p id="pro-user-current">Sessão atual</p></div><button class="ib" type="button" id="pro-user-close" aria-label="Fechar">✕</button></div>
+  <div class="pro-user-actions">
+   <button type="button" class="pro-user-switch" id="pro-user-switch">🔄 Alternar usuário</button>
+   <button type="button" class="pro-user-logout" id="pro-user-logout">🚪 Fazer logout e voltar ao login</button>
+   <button type="button" class="pro-user-cancel" id="pro-user-cancel">Cancelar</button>
+  </div>
+ </div>
+</div>
 
 <dialog id="dlg">
  <h2 id="dt2">Atividade</h2>
@@ -631,9 +670,9 @@ setInterval(tick,1000);applyT();tick();rs();rd();rc();rsent();ejload();$('#bRem'
   $v('#pro-close-set').onclick=()=>box.style.display='none';box.addEventListener('click',e=>{if(e.target===box)box.style.display='none';const b=e.target.closest('[data-palette]');if(b){S.set.palette=b.dataset.palette;save();applyPalette();box.remove();settings();home();toast('Paleta atualizada ✨')}});$v('#pro-auto-backup').onclick=()=>{S.set.autoBackup=!S.set.autoBackup;save();box.remove();settings();toast(S.set.autoBackup?'Backup automático ativado':'Backup automático desativado')};
  }
  const pt=document.querySelector('#pro-tools');if(pt&&!$v('#pro-settings-btn')){const b=document.createElement('button');b.id='pro-settings-btn';b.title='Personalização';b.textContent='⚙️';pt.appendChild(b);b.onclick=settings;}
- // Role badge + logout
+ // Identificação do usuário + menu de sessão.
  const hdr=document.querySelector('header .hw');if(hdr&&!$v('#pro-role')){const r=document.createElement('span');r.id='pro-role';r.className='pro-role';r.textContent=document.body.classList.contains('guest-mode')?'👁️ Convidado':'👑 Leonardo';hdr.querySelector('#pro-tools')?.prepend(r);}
- if(pt&&!$v('#pro-logout')){const b=document.createElement('button');b.id='pro-logout';b.className='pro-logout';b.title='Sair';b.textContent='🚪';pt.appendChild(b);b.onclick=()=>{sessionStorage.removeItem('cronoLeo_auth_v1');location.reload()}}
+ const userNav=$v('#pro-user-nav');if(userNav){userNav.onclick=()=>window.openUserModal?.();}
  // Mobile bottom navigation
  if(!$v('#pro-bottom-nav')){const b=document.createElement('div');b.id='pro-bottom-nav';b.innerHTML='<button data-v="home">🏠<br>Início</button><button data-v="sch">📅<br>Agenda</button><button data-v="dash">📊<br>Dados</button><button data-v="notes">📝<br>Notas</button><button data-v="mail">✉️<br>E-mail</button>';document.body.appendChild(b);b.addEventListener('click',e=>{const x=e.target.closest('button');if(x)window.tab(x.dataset.v)});}
  function syncBottom(v){$$v('#pro-bottom-nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v))}
@@ -768,6 +807,25 @@ setInterval(tick,1000);applyT();tick();rs();rd();rc();rsent();ejload();$('#bRem'
 
 
 <script>
+/* === Menu de usuário: logout e alternância de sessão === */
+(function(){
+ const modal=document.getElementById('pro-user-modal'), current=document.getElementById('pro-user-current');
+ if(!modal)return;
+ function openUserModal(){if(current)current.textContent=document.body.classList.contains('guest-mode')?'👁️ Convidado · somente visualização':'👑 Administrador · acesso completo';modal.classList.add('show');modal.setAttribute('aria-hidden','false');}
+ function closeUserModal(){modal.classList.remove('show');modal.setAttribute('aria-hidden','true');}
+ function backToLogin(){sessionStorage.removeItem('cronoLeo_auth_v1');closeUserModal();location.reload();}
+ window.openUserModal=openUserModal;
+ document.getElementById('pro-user-nav')?.addEventListener('click',openUserModal);
+ document.getElementById('pro-user-close')?.addEventListener('click',closeUserModal);
+ document.getElementById('pro-user-cancel')?.addEventListener('click',closeUserModal);
+ document.getElementById('pro-user-switch')?.addEventListener('click',backToLogin);
+ document.getElementById('pro-user-logout')?.addEventListener('click',backToLogin);
+ modal.addEventListener('click',e=>{if(e.target===modal)closeUserModal()});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('show'))closeUserModal()});
+})();
+</script>
+
+<script>
 /* === Controle de acesso local do Cronograma ===
  * Observação: como este é um único HTML público, o login é uma barreira de uso no navegador,
  * não uma autenticação de servidor. Para segurança real com dados privados, use autenticação + backend.
@@ -798,12 +856,12 @@ setInterval(tick,1000);applyT();tick();rs();rd();rc();rsent();ejload();$('#bRem'
   const paletteBox=document.getElementById('authPalette'), paletteGrid=paletteBox?.querySelector('.auth-palette-grid');
   function loadPalette(){try{const raw=JSON.parse(localStorage.getItem('cronoLeo_v7')||'null');const p=raw?.set?.palette||'royal';document.documentElement.dataset.palette=PALETTES[p]?p:'royal';}catch(e){document.documentElement.dataset.palette='royal';}}
   function renderAuthPalettes(){if(!paletteGrid)return;const current=document.documentElement.dataset.palette||'royal';paletteGrid.innerHTML=Object.entries(PALETTES).map(([k,c])=>`<button type="button" class="auth-pick ${current===k?'active':''}" data-auth-palette="${k}"><span class="sw"><i style="background:${c[0]}"></i><i style="background:${c[1]}"></i></span>${paletteNames[k]}</button>`).join('');}
-  function openAuthPalettes(){renderAuthPalettes();paletteBox.style.display='flex';paletteBox.setAttribute('aria-hidden','false');}
-  function closeAuthPalettes(){paletteBox.style.display='none';paletteBox.setAttribute('aria-hidden','true');}
+  function openAuthPalettes(){if(!paletteBox)return;renderAuthPalettes();paletteBox.style.display='flex';paletteBox.setAttribute('aria-hidden','false');}
+  function closeAuthPalettes(){if(!paletteBox)return;paletteBox.style.display='none';paletteBox.setAttribute('aria-hidden','true');}
   loadPalette();
-  document.getElementById('authAppearance')?.addEventListener('click',openAuthPalettes);
-  document.getElementById('authPaletteClose')?.addEventListener('click',closeAuthPalettes);
-  paletteBox?.addEventListener('click',e=>{if(e.target===paletteBox)closeAuthPalettes();const b=e.target.closest('[data-auth-palette]');if(!b)return;const p=b.dataset.authPalette;document.documentElement.dataset.palette=p;try{const raw=JSON.parse(localStorage.getItem('cronoLeo_v7')||'null')||{};raw.set=raw.set||{};raw.set.palette=p;localStorage.setItem('cronoLeo_v7',JSON.stringify(raw));}catch(err){}renderAuthPalettes();});
+  document.getElementById('authAppearance')?.addEventListener('click',e=>{e.preventDefault();openAuthPalettes();});
+  document.getElementById('authPaletteClose')?.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();closeAuthPalettes();});
+  paletteBox?.addEventListener('click',e=>{if(e.target===paletteBox){closeAuthPalettes();return;}const b=e.target.closest('[data-auth-palette]');if(!b)return;const p=b.dataset.authPalette;if(!PALETTES[p])return;document.documentElement.dataset.palette=p;try{const raw=JSON.parse(localStorage.getItem('cronoLeo_v7')||'null')||{};raw.set=raw.set||{};raw.set.palette=p;localStorage.setItem('cronoLeo_v7',JSON.stringify(raw));}catch(err){}renderAuthPalettes();});
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&paletteBox?.style.display==='flex')closeAuthPalettes();});
 
   // Cada botão abre sua própria janela para solicitar login e senha.
